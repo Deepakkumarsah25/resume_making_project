@@ -2,81 +2,99 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
+const connectDB = require('./config/db');
+const User = require('./models/User'); // If filename is capitalized
+
 const app = express();
 
-// सत्र मिडलवेयर
+// Connect to MongoDB
+connectDB();
+
+// Session middleware
 app.use(session({
   secret: process.env.SESSION_SECRET || 'apna-secret-key-123',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   cookie: { 
     secure: false,
-    maxAge: 24 * 60 * 60 * 1000 // 24 घंटे
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 
-// मिडलवेयर
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// स्टेटिक फाइलें
 app.use(express.static(path.join(__dirname, 'public')));
 
-// EJS व्यू इंजन
+// View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// सभी टेम्पलेट्स में user उपलब्ध कराने के लिए
+// Make user available in all templates
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   next();
 });
 
-// अस्थायी डेटाबेस
-const users = [];
+// Routes -------------------------------------------------
 
-// रूट्स -------------------------------------------------
-
-// होम पेज
+// Home page
 app.get('/', (req, res) => {
   res.render('home', { currentPage: 'home' });
 });
 
-// साइनअप पेज (GET)
+// Signup page (GET)
 app.get('/signup', (req, res) => {
+  if (req.session.user) return res.redirect('/main');
+  
   const error = req.query.error;
   res.render('signup', { 
     currentPage: 'signup',
-    error: error === 'exists' ? 'ईमेल पहले से मौजूद है' : null
+    error: error === 'exists' ? 'ईमेल पहले से मौजूद है' : 
+            error === 'username' ? 'उपयोगकर्ता नाम पहले से उपयोग में है' : null
   });
 });
 
-// साइनअप प्रोसेस (POST)
-app.post('/signup', (req, res) => {
-  const { name, email, password } = req.body;
-  
-  // ईमेल चेक करें
-  const userExists = users.some(user => user.email === email);
-  if (userExists) {
-    return res.redirect('/signup?error=exists');
+// Signup process (POST)
+app.post('/signup', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    
+    // Check if email exists
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+      return res.redirect('/signup?error=exists');
+    }
+    
+    // Check if username exists
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+      return res.redirect('/signup?error=username');
+    }
+    
+    // Create new user
+    const newUser = new User({ 
+      username,
+      email, 
+      password
+    });
+    
+    // Save to database
+    await newUser.save();
+    
+    // Redirect to login with success message
+    res.redirect('/login?signup=success');
+    
+  } catch (err) {
+    console.error(err);
+    res.redirect('/signup?error=unknown');
   }
-  
-  // नया यूजर बनाएं
-  const newUser = { 
-    id: Date.now().toString(), 
-    name, 
-    email, 
-    password 
-  };
-  
-  users.push(newUser);
-  
-  // लॉगइन पेज पर रीडायरेक्ट
-  res.redirect('/login?signup=success');
 });
 
-// लॉगइन पेज (GET)
+// Login page (GET)
 app.get('/login', (req, res) => {
+  if (req.session.user) return res.redirect('/main');
+  
   const signupSuccess = req.query.signup === 'success';
   const error = req.query.error === 'invalid' ? 'गलत ईमेल या पासवर्ड' : null;
   
@@ -87,23 +105,41 @@ app.get('/login', (req, res) => {
   });
 });
 
-// लॉगइन प्रोसेस (POST)
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  
-  // यूजर खोजें
-  const user = users.find(u => u.email === email && u.password === password);
-  
-  if (user) {
-    // सत्र में यूजर सेव करें
-    req.session.user = user;
+// Login process (POST)
+app.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    // Find user by email
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.redirect('/login?error=invalid');
+    }
+    
+    // Compare passwords
+    const isMatch = await user.comparePassword(password);
+    
+    if (!isMatch) {
+      return res.redirect('/login?error=invalid');
+    }
+    
+    // Set session
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    };
+    
+    // Redirect to main page after login
     res.redirect('/main');
-  } else {
-    res.redirect('/login?error=invalid');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/login?error=unknown');
   }
 });
 
-// मुख्य पेज (प्रोटेक्टेड)
+// Main page (protected)
 app.get('/main', (req, res) => {
   if (!req.session.user) {
     return res.redirect('/login');
@@ -115,7 +151,7 @@ app.get('/main', (req, res) => {
   });
 });
 
-// लॉगआउट
+// Logout
 app.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) console.log(err);
@@ -123,7 +159,55 @@ app.get('/logout', (req, res) => {
   });
 });
 
-// सर्वर स्टार्ट
+// Forgot Password Page
+app.get('/forgot-password', (req, res) => {
+  res.render('forgot-password', { 
+    currentPage: 'forgot-password',
+    message: null,
+    error: null
+  });
+});
+
+// Forgot Password Process
+app.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    // Find user by email
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.render('forgot-password', {
+        currentPage: 'forgot-password',
+        message: null,
+        error: 'ईमेल पता नहीं मिला'
+      });
+    }
+    
+    // Generate reset token
+    const resetToken = Math.random().toString(36).slice(2, 10).toUpperCase();
+    user.resetToken = resetToken;
+    user.resetTokenExpiration = Date.now() + 3600000; // 1 hour
+    
+    await user.save();
+    
+    res.render('forgot-password', {
+      currentPage: 'forgot-password',
+      message: `पासवर्ड रीसेट लिंक आपके ईमेल पर भेजा गया है। टोकन: ${resetToken}`,
+      error: null
+    });
+    
+  } catch (err) {
+    console.error(err);
+    res.render('forgot-password', {
+      currentPage: 'forgot-password',
+      message: null,
+      error: 'त्रुटि हुई, कृपया बाद में प्रयास करें'
+    });
+  }
+});
+
+// Server start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`सर्वर चल रहा है: http://localhost:${PORT}`);

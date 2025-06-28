@@ -418,3 +418,91 @@ body {
 .footer-links a:hover {
   color: #1a73e8;
 }
+/* Add to your existing CSS */
+.form-footer {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-footer a {
+  color: #4a69bd;
+  text-decoration: none;
+}
+
+.form-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Add to your existing CSS */
+.form-footer {
+  margin-top: 15px;
+  text-align: center;
+}
+
+.form-footer a {
+  color: #4a69bd;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.form-footer a:hover {
+  text-decoration: underline;
+}
+
+.login-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Add this to your existing CSS */
+.user-header {
+    text-align: center;
+    padding: 30px;
+    background: linear-gradient(135deg, #4a69bd, #6a89cc);
+    color: white;
+    border-radius: 10px;
+    margin: 20px 0 40px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.user-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2.5rem;
+    color: #4a69bd;
+}
+
+.user-name {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.user-email {
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.nav-links a.logout {
+    color: #ff6b6b;
+}
+
+.nav-links a.logout:hover {
+    color: #ff4757;
+}
+
+.alert.success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 4px solid #28a745;
+  padding: 10px 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
