@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeCraft | Automatic Resume Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4CAF50;
+            --warning: #ffb703;
+            --danger: #e63946;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        /* Navbar Styles */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .logo i {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            outline: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(67, 97, 238, 0.9), rgba(63, 55, 201, 0.9)), url('https://images.unsplash.com/photo-1499750310107-5fef28a66643?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 5rem 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            max-width: 800px;
+        }
+        
+        .hero p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--secondary);
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        /* Resume Form */
+        .resume-form {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 3rem;
+            margin-bottom: 4rem;
+        }
+        
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .form-header h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .submit-section {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .btn-generate {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.1rem;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-generate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+        
+        /* Resume Preview */
+        .resume-preview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            padding: 3rem;
+            display: none;
+            margin-bottom: 4rem;
+        }
+        
+        .preview-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .preview-header h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        
+        .resume-template {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .resume-header {
+            text-align: center;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 2rem;
+        }
+        
+        .resume-header h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .resume-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .resume-section {
+            margin-bottom: 2rem;
+        }
+        
+        .resume-section h2 {
+            color: var(--secondary);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        .experience-item, .education-item {
+            margin-bottom: 1.5rem;
+        }
+        
+        .experience-header, .education-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .experience-title, .education-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .experience-date, .education-date {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .skills-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+        
+        .skill-tag {
+            background: #eef2ff;
+            color: var(--primary);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-weight: 500;
+        }
+        
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(to bottom right, var(--accent), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            color: white;
+            font-size: 2rem;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 4rem 2rem 2rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .social-link:hover {
+            background: var(--primary);
+            transform: translateY(-5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 3rem;
+            color: #aaa;
+            font-size: 0.9rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-top: 1px solid #444;
+            padding-top: 2rem;
+            margin-top: 2rem;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .resume-form, .resume-preview {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-file-alt"></i>
+            <span>ResumeCraft</span>
+        </div>
+        <div class="nav-links">
+            <a href="#home">Home</a>
+            <a href="#create">Create Resume</a>
+            <a href="#templates">Templates</a>
+            <a href="#features">Features</a>
+            <a href="#contact">Contact</a>
+        </div>
+        <div class="auth-buttons">
+            <button class="btn btn-outline">Sign In</button>
+            <button class="btn btn-primary">Sign Up</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Create Professional Resumes in Minutes</h1>
+        <p>Stand out from the crowd with our easy-to-use resume builder. Impress employers with a beautifully designed resume tailored to your career.</p>
+        <button class="btn btn-primary btn-generate">Create Your Resume Now</button>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Resume Form Section -->
+        <div class="section-title">
+            <h2>Create Your Resume</h2>
+            <p>Fill in your details and generate a professional resume instantly</p>
+        </div>
+        
+        <div class="resume-form" id="create">
+            <div class="form-header">
+                <h3>Personal Information</h3>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" class="form-control" placeholder="John Doe">
+                </div>
+                
+                <div class="form-group">
+                    <label for="jobTitle">Professional Title</label>
+                    <input type="text" id="jobTitle" class="form-control" placeholder="Software Engineer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" class="form-control" placeholder="(123) 456-7890">
+                </div>
+                
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" class="form-control" placeholder="New York, NY">
+                </div>
+                
+                <div class="form-group">
+                    <label for="website">Website/Portfolio</label>
+                    <input type="url" id="website" class="form-control" placeholder="https://yourportfolio.com">
+                </div>
+            </div>
+            
+            <div class="form-header">
+                <h3>Professional Experience</h3>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="company">Company</label>
+                    <input type="text" id="company" class="form-control" placeholder="Tech Solutions Inc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="position">Position</label>
+                    <input type="text" id="position" class="form-control" placeholder="Senior Developer">
+                </div>
+                
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="text" id="startDate" class="form-control" placeholder="Jan 2020">
+                </div>
+                
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="text" id="endDate" class="form-control" placeholder="Present">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="experience">Experience Description</label>
+                <textarea id="experience" class="form-control" placeholder="Describe your responsibilities and achievements..."></textarea>
+            </div>
+            
+            <div class="form-header">
+                <h3>Education</h3>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="school">School/University</label>
+                    <input type="text" id="school" class="form-control" placeholder="University of Technology">
+                </div>
+                
+                <div class="form-group">
+                    <label for="degree">Degree</label>
+                    <input type="text" id="degree" class="form-control" placeholder="Bachelor of Science in Computer Science">
+                </div>
+                
+                <div class="form-group">
+                    <label for="schoolStart">Start Year</label>
+                    <input type="text" id="schoolStart" class="form-control" placeholder="2016">
+                </div>
+                
+                <div class="form-group">
+                    <label for="schoolEnd">End Year</label>
+                    <input type="text" id="schoolEnd" class="form-control" placeholder="2020">
+                </div>
+            </div>
+            
+            <div class="form-header">
+                <h3>Skills</h3>
+            </div>
+            
+            <div class="form-group">
+                <label for="skills">Add Your Skills (separated by commas)</label>
+                <input type="text" id="skills" class="form-control" placeholder="JavaScript, React, Node.js, Python, UI/UX Design">
+            </div>
+            
+            <div class="form-group">
+                <label for="summary">Professional Summary</label>
+                <textarea id="summary" class="form-control" placeholder="Write a brief summary of your professional background..."></textarea>
+            </div>
+            
+            <div class="submit-section">
+                <button class="btn-generate" onclick="generateResume()">Generate Resume</button>
+            </div>
+        </div>
+        
+        <!-- Resume Preview Section -->
+        <div class="resume-preview" id="resumePreview">
+            <div class="preview-header">
+                <h3>Your Professional Resume</h3>
+                <p>Preview and download your resume</p>
+            </div>
+            
+            <div class="resume-template" id="resumeTemplate">
+                <div class="resume-header">
+                    <h1 id="resumeName">John Doe</h1>
+                    <p id="resumeTitle">Software Engineer</p>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span id="resumeEmail">john@example.com</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <span id="resumePhone">(123) 456-7890</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span id="resumeLocation">New York, NY</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-globe"></i>
+                            <span id="resumeWebsite">yourportfolio.com</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Professional Summary</h2>
+                    <p id="resumeSummary">Experienced software engineer with 5+ years of expertise in developing scalable web applications. Proficient in JavaScript, React, Node.js, and modern development practices. Passionate about creating efficient, user-friendly solutions that solve real-world problems.</p>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Work Experience</h2>
+                    <div class="experience-item">
+                        <div class="experience-header">
+                            <div class="experience-title" id="resumePosition">Senior Developer</div>
+                            <div class="experience-date" id="resumeDate">Jan 2020 - Present</div>
+                        </div>
+                        <div class="experience-company" id="resumeCompany">Tech Solutions Inc.</div>
+                        <p id="resumeExperience">Led a team of developers in creating a customer management system that increased client retention by 25%. Implemented modern React practices and optimized application performance. Collaborated with UX designers to create intuitive user interfaces.</p>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Education</h2>
+                    <div class="education-item">
+                        <div class="education-header">
+                            <div class="education-title" id="resumeDegree">BSc in Computer Science</div>
+                            <div class="education-date" id="resumeSchoolDate">2016 - 2020</div>
+                        </div>
+                        <div class="education-school" id="resumeSchool">University of Technology</div>
+                        <p>Graduated with honors. Relevant coursework: Algorithms, Data Structures, Web Development, Database Systems.</p>
+                    </div>
+                </div>
+                
+                <div class="resume-section">
+                    <h2>Skills</h2>
+                    <div class="skills-list" id="resumeSkills">
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">React</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">UI/UX Design</span>
+                        <span class="skill-tag">Database Management</span>
+                        <span class="skill-tag">Agile Methodologies</span>
+                        <span class="skill-tag">Problem Solving</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="submit-section">
+                <button class="btn-generate" onclick="downloadResume()">Download Resume</button>
+                <button class="btn-generate" onclick="editResume()" style="background: #666; margin-left: 10px;">Edit Resume</button>
+            </div>
+        </div>
+        
+        <!-- Features Section -->
+        <div class="section-title" id="features">
+            <h2>Why Choose ResumeCraft?</h2>
+            <p>Our platform offers everything you need to create the perfect resume</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Quick & Easy</h3>
+                <p>Create a professional resume in minutes with our intuitive interface. No design skills required.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-palette"></i>
+                </div>
+                <h3>Beautiful Templates</h3>
+                <p>Choose from multiple designer-made templates that impress recruiters.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Mobile Friendly</h3>
+                <p>Create and edit your resume on any device - desktop, tablet, or mobile.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-file-download"></i>
+                </div>
+                <h3>Download & Print</h3>
+                <p>Download your resume as PDF or print it directly for job applications.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>ResumeCraft</h3>
+                <p>Creating professional resumes has never been easier. Stand out from the competition with our easy-to-use resume builder.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#create">Create Resume</a></li>
+                    <li><a href="#templates">Templates</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Resume Examples</a></li>
+                    <li><a href="#">Cover Letter Templates</a></li>
+                    <li><a href="#">Career Blog</a></li>
+                    <li><a href="#">Job Search Tips</a></li>
+                    <li><a href="#">Interview Guide</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contact Us</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i> support@resumecraft.com</li>
+                    <li><i class="fas fa-phone"></i> +1 (800) 123-4567</li>
+                    <li><i class="fas fa-map-marker-alt"></i> 123 Innovation Street, Tech City</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2023 ResumeCraft. All rights reserved. | Designed with <i class="fas fa-heart" style="color: #e63946;"></i> for job seekers</p>
+        </div>
+    </footer>
+    
+    <script>
+        // Generate Resume Function
+        function generateResume() {
+            // Get form values
+            const fullName = document.getElementById('fullName').value || 'John Doe';
+            const jobTitle = document.getElementById('jobTitle').value || 'Software Engineer';
+            const email = document.getElementById('email').value || 'john@example.com';
+            const phone = document.getElementById('phone').value || '(123) 456-7890';
+            const location = document.getElementById('location').value || 'New York, NY';
+            const website = document.getElementById('website').value || 'yourportfolio.com';
+            const company = document.getElementById('company').value || 'Tech Solutions Inc.';
+            const position = document.getElementById('position').value || 'Senior Developer';
+            const startDate = document.getElementById('startDate').value || 'Jan 2020';
+            const endDate = document.getElementById('endDate').value || 'Present';
+            const experience = document.getElementById('experience').value || 'Led a team of developers in creating a customer management system that increased client retention by 25%. Implemented modern React practices and optimized application performance. Collaborated with UX designers to create intuitive user interfaces.';
+            const school = document.getElementById('school').value || 'University of Technology';
+            const degree = document.getElementById('degree').value || 'Bachelor of Science in Computer Science';
+            const schoolStart = document.getElementById('schoolStart').value || '2016';
+            const schoolEnd = document.getElementById('schoolEnd').value || '2020';
+            const skills = document.getElementById('skills').value || 'JavaScript, React, Node.js, Python, UI/UX Design, Database Management, Agile Methodologies, Problem Solving';
+            const summary = document.getElementById('summary').value || 'Experienced software engineer with 5+ years of expertise in developing scalable web applications. Proficient in JavaScript, React, Node.js, and modern development practices. Passionate about creating efficient, user-friendly solutions that solve real-world problems.';
+            
+            // Set resume values
+            document.getElementById('resumeName').textContent = fullName;
+            document.getElementById('resumeTitle').textContent = jobTitle;
+            document.getElementById('resumeEmail').textContent = email;
+            document.getElementById('resumePhone').textContent = phone;
+            document.getElementById('resumeLocation').textContent = location;
+            document.getElementById('resumeWebsite').textContent = website;
+            document.getElementById('resumeCompany').textContent = company;
+            document.getElementById('resumePosition').textContent = position;
+            document.getElementById('resumeDate').textContent = `${startDate} - ${endDate}`;
+            document.getElementById('resumeExperience').textContent = experience;
+            document.getElementById('resumeSchool').textContent = school;
+            document.getElementById('resumeDegree').textContent = degree;
+            document.getElementById('resumeSchoolDate').textContent = `${schoolStart} - ${schoolEnd}`;
+            document.getElementById('resumeSummary').textContent = summary;
+            
+            // Format skills
+            const skillsArray = skills.split(',').map(skill => skill.trim());
+            const skillsContainer = document.getElementById('resumeSkills');
+            skillsContainer.innerHTML = '';
+            
+            skillsArray.forEach(skill => {
+                if (skill) {
+                    const skillTag = document.createElement('span');
+                    skillTag.className = 'skill-tag';
+                    skillTag.textContent = skill;
+                    skillsContainer.appendChild(skillTag);
+                }
+            });
+            
+            // Show the resume preview
+            document.querySelector('.resume-form').style.display = 'none';
+            document.getElementById('resumePreview').style.display = 'block';
+            
+            // Scroll to the resume preview
+            document.getElementById('resumePreview').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Edit Resume Function
+        function editResume() {
+            document.querySelector('.resume-form').style.display = 'block';
+            document.getElementById('resumePreview').style.display = 'none';
+            
+            // Scroll to the form
+            document.querySelector('.resume-form').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Download Resume Function
+        function downloadResume() {
+            alert('Resume downloaded successfully! In a real application, this would generate a PDF file.');
+        }
+        
+        // Scroll to Create Resume section when button clicked
+        document.querySelector('.hero .btn-generate').addEventListener('click', function() {
+            document.getElementById('create').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>

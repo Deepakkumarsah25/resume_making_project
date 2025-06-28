@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>लॉग इन</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('partials/navbar', { currentPage: 'login' }) %>
+  
+  <main class="container">
+    <h1>लॉग इन</h1>
+    
+    <% if (signupSuccess) { %>
+      <div class="alert success">साइनअप सफल! कृपया लॉग इन करें।</div>
+    <% } %>
+    
+    <% if (error) { %>
+      <div class="alert error"><%= error %></div>
+    <% } %>
+    
+    <form action="/login" method="POST" class="form">
+      <div class="form-group">
+        <label for="email">ईमेल:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">पासवर्ड:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      
+      <button type="submit" class="btn">लॉग इन करें</button>
+    </form>
+    
+    <div class="signup-link">
+      नया यूजर? <a href="/signup">साइन अप करें</a>
+    </div>
+  </main>
+</body>
+</html>

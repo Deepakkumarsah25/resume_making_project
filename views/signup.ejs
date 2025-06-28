@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>साइन अप</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('partials/navbar', { currentPage: 'signup' }) %>
+  
+  <main class="container">
+    <h1>साइन अप</h1>
+    
+    <% if (error) { %>
+      <div class="alert error"><%= error %></div>
+    <% } %>
+    
+    <form action="/signup" method="POST" class="form">
+      <div class="form-group">
+        <label for="name">पूरा नाम:</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">ईमेल:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">पासवर्ड:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      
+      <button type="submit" class="btn">साइन अप करें</button>
+    </form>
+    
+    <div class="login-link">
+      पहले से अकाउंट है? <a href="/login">लॉग इन करें</a>
+    </div>
+  </main>
+</body>
+</html>
