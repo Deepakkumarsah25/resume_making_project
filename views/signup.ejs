@@ -4,40 +4,539 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>साइन अप</title>
-  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --primary: #00f7ff;
+      --secondary: #ff00e4;
+      --bg: #0f0f1a;
+      --card-bg: #1a1a2e;
+      --text: #e0e0e0;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      filter: blur(2px);
+      opacity: 0.7;
+    }
+
+    .signup-container {
+      position: relative;
+      z-index: 2;
+      width: 90%;
+      max-width: 500px;
+      background-color: var(--card-bg);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 0 30px rgba(0, 247, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      transition: transform 0.5s ease;
+    }
+
+    .signup-container:hover {
+      transform: translateY(-5px) rotateX(5deg);
+    }
+
+    .signup-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .signup-header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+    }
+
+    .signup-header p {
+      color: rgba(224, 224, 224, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .signup-header::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 3px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 15px 20px;
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(0, 247, 255, 0.2);
+    }
+
+    .input-group label {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      color: rgba(224, 224, 224, 0.7);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      background-color: var(--card-bg);
+      padding: 0 5px;
+    }
+
+    .input-group input:focus + label,
+    .input-group input:not(:placeholder-shown) + label {
+      top: -10px;
+      left: 15px;
+      font-size: 0.8rem;
+      color: var(--primary);
+    }
+
+    .password-strength {
+      height: 4px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0;
+      background-color: #ff0000;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+
+    .terms {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .terms input {
+      margin-right: 10px;
+      accent-color: var(--primary);
+    }
+
+    .terms a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .signup-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .signup-btn:hover::before {
+      left: 100%;
+    }
+
+    .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 247, 255, 0.3);
+    }
+
+    .social-login {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .social-login p {
+      position: relative;
+      margin-bottom: 1rem;
+      color: rgba(224, 224, 224, 0.7);
+      font-size: 0.9rem;
+    }
+
+    .social-login p::before,
+    .social-login p::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .social-login p::before {
+      left: 0;
+    }
+
+    .social-login p::after {
+      right: 0;
+    }
+
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      font-weight: bold;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .social-icon.google {
+      background-color: #db4437;
+      color: white;
+    }
+
+    .social-icon.facebook {
+      background-color: #4267B2;
+      color: white;
+    }
+
+    .social-icon.linkedin {
+      background-color: #0077b5;
+      color: white;
+    }
+
+    .social-icon.twitter {
+      background-color: #1DA1F2;
+      color: white;
+    }
+
+    .social-icon::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .social-icon:hover::before {
+      left: 100%;
+    }
+
+    .social-icon:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    .login-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Floating animation */
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .floating {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .signup-container {
+        padding: 1.5rem;
+      }
+      
+      .signup-header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .input-group input {
+        padding: 12px 15px;
+      }
+    }
+
+    /* Error message styling */
+    .alert {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    .alert.error {
+      background-color: rgba(255, 0, 0, 0.1);
+      border: 1px solid rgba(255, 0, 0, 0.3);
+      color: #ff6b6b;
+    }
+  </style>
 </head>
 <body>
   <%- include('partials/navbar', { currentPage: 'signup' }) %>
   
-  <main class="container">
-    <h1>साइन अप</h1>
+  <div class="particles" id="particles"></div>
+  
+  <div class="signup-container floating">
+    <div class="signup-header">
+      <h1>Sine Up</h1>
+      
+    </div>
     
     <% if (error) { %>
       <div class="alert error"><%= error %></div>
     <% } %>
     
-    <form action="/signup" method="POST" class="form">
-      <div class="form-group">
-        <label for="username">उपयोगकर्ता नाम:</label>
-        <input type="text" id="username" name="username" required>
+    <form id="signupForm" action="/signup" method="POST">
+      <div class="input-group">
+        <input type="text" id="username" name="username" placeholder=" " required>
+        <label for="username">Username</label>
       </div>
       
-      <div class="form-group">
-        <label for="email">ईमेल:</label>
-        <input type="email" id="email" name="email" required>
+      <div class="input-group">
+        <input type="email" id="email" name="email" placeholder=" " required>
+        <label for="email">Email Address</label>
       </div>
       
-      <div class="form-group">
-        <label for="password">पासवर्ड:</label>
-        <input type="password" id="password" name="password" required>
+      <div class="input-group">
+        <input type="password" id="password" name="password" placeholder=" " required>
+        <label for="password">Password</label>
+        <div class="password-strength">
+          <div class="strength-bar" id="strengthBar"></div>
+        </div>
       </div>
       
-      <button type="submit" class="btn">साइन अप करें</button>
+      <div class="terms">
+        <label class="terms">
+          <input type="checkbox" required>
+    I agree to the <a href="#">Terms</a> and <a href="#">Privacy Policy</a>
+        </label>
+      </div>
+      
+      <button type="submit" class="signup-btn">SIGN UP</button>
     </form>
     
     <div class="login-link">
-      पहले से अकाउंट है? <a href="/login">लॉग इन करें</a>
+      Already have an account <a href="/login">Log in</a>
     </div>
-  </main>
+    
+    <div class="social-login">
+      <p>Or sign up with</p>
+      <div class="social-icons">
+        <a href="https://accounts.google.com/signin" class="social-icon google" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.784-1.667-4.166-2.685-6.735-2.685-5.522 0-10 4.477-10 10s4.478 10 10 10c8.396 0 10-7.524 10-10 0-0.67-0.069-1.325-0.189-1.961h-9.811z"></path>
+          </svg>
+        </a>
+        <a href="https://www.facebook.com/login/" class="social-icon facebook" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"></path>
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com/login" class="social-icon linkedin" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+          </svg>
+        </a>
+        <a href="https://twitter.com/i/flow/login" class="social-icon twitter" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Create floating particles
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = window.innerWidth < 600 ? 20 : 40;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random size between 3px and 8px
+        const size = Math.random() * 5 + 3;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Random animation
+        const duration = Math.random() * 20 + 10;
+        const delay = Math.random() * 5;
+        particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+        
+        particlesContainer.appendChild(particle);
+      }
+    }
+    
+    // Password strength indicator
+    function checkPasswordStrength(password) {
+      const strengthBar = document.getElementById('strengthBar');
+      let strength = 0;
+      
+      if (password.length >= 8) strength += 1;
+      if (password.match(/[a-z]/)) strength += 1;
+      if (password.match(/[A-Z]/)) strength += 1;
+      if (password.match(/[0-9]/)) strength += 1;
+      if (password.match(/[^a-zA-Z0-9]/)) strength += 1;
+      
+      let width = strength * 20;
+      let color = '#ff0000'; // red
+      
+      if (strength >= 4) {
+        color = '#00ff00'; // green
+      } else if (strength >= 2) {
+        color = '#ffa500'; // orange
+      }
+      
+      strengthBar.style.width = `${width}%`;
+      strengthBar.style.backgroundColor = color;
+    }
+    
+    // Form validation
+    function validateForm(event) {
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      // Simple validation
+      if (username.length < 3) {
+         alert('Username must be at least 3 characters');
+        event.preventDefault();
+        return;
+      }
+      
+      if (!email.includes('@') || !email.includes('.')) {
+        alert('Please enter a valid email address');
+        event.preventDefault();
+        return;
+      }
+      
+      if (password.length < 8) {
+         alert('Password must be at least 8 characters');
+        event.preventDefault();
+        return;
+      }
+    }
+    
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      createParticles();
+      
+      document.getElementById('password').addEventListener('input', function(e) {
+        checkPasswordStrength(e.target.value);
+      });
+      
+      document.getElementById('signupForm').addEventListener('submit', validateForm);
+      
+      // Add 3D tilt effect
+      const signupContainer = document.querySelector('.signup-container');
+      
+      signupContainer.addEventListener('mousemove', (e) => {
+        const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+        const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+        signupContainer.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+      });
+      
+      signupContainer.addEventListener('mouseleave', () => {
+        signupContainer.style.transform = 'translateY(-5px)';
+      });
+    });
+  </script>
 </body>
 </html>

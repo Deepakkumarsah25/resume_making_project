@@ -107,8 +107,6 @@
             background: rgba(255, 255, 255, 0.9);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
             animation: slideDown 0.5s ease-out;
-           
-           
         }
         
         @keyframes slideDown {
@@ -121,9 +119,7 @@
             justify-content: space-between;
             align-items: center;
             position: relative;
-             display: flex;
-           align-items: center;
-           margin-top: -20px;
+            margin-top: -20px;
         }
         
         .logo {
@@ -181,6 +177,9 @@
         .hamburger {
             display: none;
             cursor: pointer;
+            font-size: 1.5rem;
+            color: var(--dark);
+            z-index: 1001;
         }
         
         /* Auth buttons */
@@ -666,6 +665,7 @@
             }
         }
         
+        /* Responsive Navbar */
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -675,11 +675,12 @@
                 font-size: 2rem;
             }
             
+            /* Navbar mobile styles */
             .nav-links {
                 position: fixed;
                 top: 0;
                 right: -100%;
-                width: 80%;
+                width: 70%;
                 height: 100vh;
                 background-color: white;
                 flex-direction: column;
@@ -697,7 +698,7 @@
             }
             
             .nav-links li {
-                margin: 1rem 0;
+                margin: 1.5rem 0;
             }
             
             .nav-links a {
@@ -706,7 +707,51 @@
             
             .hamburger {
                 display: block;
-                z-index: 1001;
+            }
+            
+            .hamburger i.active {
+                display: none;
+            }
+            
+            .hamburger .close-icon {
+                display: none;
+            }
+            
+            .hamburger.active .close-icon {
+                display: block;
+            }
+            
+            .hamburger.active .menu-icon {
+                display: none;
+            }
+            
+            .auth-container {
+                display: none;
+            }
+            
+            .mobile-auth {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                align-items: center;
+                padding: 0 2rem;
+                margin-top: 2rem;
+            }
+            
+            .mobile-auth .btn-login,
+            .mobile-auth .btn-signup {
+                width: 80%;
+                text-align: center;
+                padding: 0.8rem 0;
+            }
+            
+            /* Navbar adjustments */
+            nav {
+                justify-content: space-between;
+                margin-right: 0;
+                margin-top: 0;
+                padding: 0 15px;
             }
             
             .hero-content, .about-content {
@@ -738,28 +783,6 @@
             
             .right {
                 left: 0;
-            }
-            
-            /* Auth buttons for mobile */
-            .auth-container {
-                display: none;
-            }
-            
-            .mobile-auth {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                width: 100%;
-                align-items: center;
-                padding: 0 2rem;
-                margin-top: 2rem;
-            }
-            
-            .mobile-auth .btn-login,
-            .mobile-auth .btn-signup {
-                width: 80%;
-                text-align: center;
-                padding: 0.8rem 0;
             }
         }
         
@@ -820,15 +843,57 @@
                 margin: 0.5rem 1rem;
             }
         }
-        nav{
-          display: flex;
-          justify-content:end;
-          margin-right: -120px;
+      
+        /* Navbar positioning */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: -20px;
         }
-        .nav-links{
-          font-size: 18px;
-          margin-right: -50px;
+        
+        .nav-links {
+            font-size: 18px;
         }
+         .mobile-auth{
+        display: none;
+        }
+.auth-container{
+  margin-right: -100px;
+}
+   /* Auth buttons */
+        .auth-container {
+            display: flex;
+            gap: 1rem;
+            margin-left: auto; /* Push to the right */
+            margin-right: -100px; /* Existing offset */
+        }
+
+        /* Mobile auth buttons - hidden by default on desktop */
+        .mobile-auth {
+            display: none;
+        }
+
+        /* Responsive Navbar */
+        @media (max-width: 768px) {
+            /* ... existing mobile styles ... */
+            
+            .auth-container {
+                display: none;
+            }
+            
+            .mobile-auth {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                align-items: center;
+                padding: 0 2rem;
+                margin-top: 2rem;
+            }
+        }
+
+
     </style>
 </head>
 <body>
@@ -843,13 +908,18 @@
                     <li><a href="#experience">Experience</a></li>
                     <li><a href="#portfolio">Portfolio</a></li>
                     <li><a href="#contact">Contact</a></li>
+                    <li class="mobile-auth">
+                        <a href="/login" class="btn-login">Login</a>
+                        <a href="/signup" class="btn-signup">Sign Up</a>
+                    </li>
                 </ul>
                 <div class="auth-container">
                     <a href="/login" class="btn-login">Login</a>
                     <a href="/signup" class="btn-signup">Sign Up</a>
                 </div>
                 <div class="hamburger">
-                    <i class="fas fa-bars"></i>
+                    <i class="fas fa-bars menu-icon"></i>
+                    <i class="fas fa-times close-icon"></i>
                 </div>
             </nav>
         </div>
@@ -872,7 +942,7 @@
                     </div>
                 </div>
                 <div class="hero-image fade-in">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80" alt="Profile Image">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=688&q=80" alt="Profile Image" width="400px">
                 </div>
             </div>
         </div>
@@ -1081,15 +1151,14 @@
         
         hamburger.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            hamburger.innerHTML = navLinks.classList.contains('active') ? 
-                '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+            hamburger.classList.toggle('active');
         });
         
         // Close mobile menu when clicking a link
         document.querySelectorAll('.nav-links a').forEach(link => {
             link.addEventListener('click', () => {
                 navLinks.classList.remove('active');
-                hamburger.innerHTML = '<i class="fas fa-bars"></i>';
+                hamburger.classList.remove('active');
             });
         });
         
@@ -1132,6 +1201,10 @@
                         top: targetElement.offsetTop - 80,
                         behavior: 'smooth'
                     });
+                    
+                    // Close mobile menu if open
+                    navLinks.classList.remove('active');
+                    hamburger.classList.remove('active');
                 }
             });
         });
